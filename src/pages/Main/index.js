@@ -14,6 +14,7 @@ export default class Main extends Component {
         newRepo: '',
         repositories: [],
         loading: false,
+        repositoryNotFound: false,
     };
 
     // load the datas of the localStorage
@@ -40,27 +41,38 @@ export default class Main extends Component {
     };
 
     handleSubmit = async (e) => {
-        e.preventDefault();
+        try {
+            e.preventDefault();
 
-        this.setState({ loading: true });
+            this.setState({ loading: true });
 
-        const { newRepo, repositories } = this.state;
+            const { newRepo, repositories } = this.state;
 
-        const response = await api.get(`/repos/${newRepo}`);
+            const response = await api.get(`/repos/${newRepo}`);
 
-        const data = {
-            name: response.data.full_name,
-        };
+            const data = {
+                name: response.data.full_name,
+            };
 
-        this.setState({
-            repositories: [...repositories, data],
-            newRepo: '',
-            loading: false,
-        });
+            this.setState({
+                repositories: [...repositories, data],
+                newRepo: '',
+                loading: false,
+                repositoryNotFound: false,
+            });
+        } catch (e) {
+            console.log(e);
+            this.setState({ repositoryNotFound: true, loading: false });
+        }
     };
 
     render() {
-        const { newRepo, loading, repositories } = this.state;
+        const {
+            newRepo,
+            loading,
+            repositories,
+            repositoryNotFound,
+        } = this.state;
         return (
             <Container>
                 <h1>
@@ -68,7 +80,10 @@ export default class Main extends Component {
                     Repositórios
                 </h1>
 
-                <Form onSubmit={this.handleSubmit}>
+                <Form
+                    onSubmit={this.handleSubmit}
+                    repositoryNotFound={repositoryNotFound}
+                >
                     <input
                         type="text"
                         placeholder="Adicionar repositório"
