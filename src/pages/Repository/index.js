@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 import api from '../../services/api';
 
-import { Loading, Owner, IssueList, TypeList } from './styles';
+import { Loading, Owner, IssueList, SelectCont } from './styles';
 import Container from '../../components/Container';
 
 export default class Repository extends Component {
@@ -96,13 +96,16 @@ export default class Repository extends Component {
                     <p>{repository.description}</p>
                 </Owner>
 
-                <TypeList>
+                <SelectCont>
                     <select id="f_slc" onChange={this.handleChange}>
-                        <option value="all">Todas</option>
+                        <option selected disabled>
+                            Filtro
+                        </option>
                         <option value="open">Abertas</option>
+                        <option value="all">Todas</option>
                         <option value="closed">Fechadas</option>
                     </select>
-                </TypeList>
+                </SelectCont>
 
                 <IssueList>
                     {issues.map((issue) => (

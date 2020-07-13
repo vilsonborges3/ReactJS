@@ -102,4 +102,19 @@ export const IssueList = styled.ul`
     }
 `;
 
-export const TypeList = styled.form``;
+export const SelectCont = styled.form`
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    select {
+        outline: 0;
+        box-shadow: none;
+        border: 0 !important;
+        background: #120a8f;
+        background-image: none;
+        color: #fff;
+        font-size: 20px;
+        border-radius: 3px;
+    }
+`;
