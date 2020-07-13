@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 import api from '../../services/api';
 
-import { Loading, Owner, IssueList } from './styles';
+import { Loading, Owner, IssueList, TypeList } from './styles';
 import Container from '../../components/Container';
 
 export default class Repository extends Component {
@@ -20,6 +20,7 @@ export default class Repository extends Component {
         repository: {},
         issues: [],
         loading: true,
+        issueState: 'open',
     };
 
     async componentDidMount() {
@@ -44,6 +45,38 @@ export default class Repository extends Component {
         });
     }
 
+    async componentDidUpdate(_, prevState) {
+        const { issueState } = this.state;
+
+        if (prevState.issueState !== issueState) {
+            console.log('caiu no up');
+
+            const { match } = this.props;
+
+            const repoName = decodeURIComponent(match.params.repository);
+
+            const [issues] = await Promise.all([
+                api.get(`/repos/${repoName}/issues`, {
+                    params: {
+                        state: issueState,
+                        per_page: 5,
+                    },
+                }),
+            ]);
+
+            this.setState({
+                issues: issues.data,
+                loading: false,
+            });
+        }
+    }
+
+    handleChange = () => {
+        const select = document.getElementById('f_slc');
+        const { value } = select.options[select.selectedIndex];
+        this.setState({ issueState: value, issues: [] });
+    };
+
     render() {
         const { repository, issues, loading } = this.state;
 
@@ -62,6 +95,14 @@ export default class Repository extends Component {
                     <h1>{repository.name}</h1>
                     <p>{repository.description}</p>
                 </Owner>
+
+                <TypeList>
+                    <select id="f_slc" onChange={this.handleChange}>
+                        <option value="all">Todas</option>
+                        <option value="open">Abertas</option>
+                        <option value="closed">Fechadas</option>
+                    </select>
+                </TypeList>
 
                 <IssueList>
                     {issues.map((issue) => (

@@ -101,3 +101,5 @@ export const IssueList = styled.ul`
         }
     }
 `;
+
+export const TypeList = styled.form``;

@@ -47,8 +47,8 @@ export default class Main extends Component {
             this.setState({ loading: true });
 
             const { newRepo, repositories } = this.state;
+
             repositories.map((repo) => {
-                console.log(newRepo, repo.name);
                 if (repo.name.toLowCase() === newRepo.toLowCase()) {
                     throw new Error('Repositórios duplicados');
                 }
