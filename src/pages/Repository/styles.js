@@ -118,3 +118,24 @@ export const SelectCont = styled.form`
         border-radius: 3px;
     }
 `;
+export const DivButtons = styled.div`
+    margin-top: 10px;
+    justify-content: space-between;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+`;
+
+export const NextPage = styled.button`
+    font-size: 20px;
+    border-radius: 2px;
+    color: #fff;
+    background: #120a8f;
+`;
+
+export const PreviousPage = styled.button`
+    font-size: 20px;
+    border-radius: 2px;
+    color: #120a8f;
+    background: #fff;
+`;

@@ -4,7 +4,15 @@ import { Link } from 'react-router-dom';
 
 import api from '../../services/api';
 
-import { Loading, Owner, IssueList, SelectCont } from './styles';
+import {
+    Loading,
+    Owner,
+    IssueList,
+    SelectCont,
+    NextPage,
+    PreviousPage,
+    DivButtons,
+} from './styles';
 import Container from '../../components/Container';
 
 export default class Repository extends Component {
@@ -21,6 +29,7 @@ export default class Repository extends Component {
         issues: [],
         loading: true,
         issueState: 'open',
+        page: 1,
     };
 
     async componentDidMount() {
@@ -33,11 +42,9 @@ export default class Repository extends Component {
             api.get(`/repos/${repoName}/issues`, {
                 params: {
                     state: 'open',
-                    per_page: 5,
                 },
             }),
         ]);
-
         this.setState({
             repository: repository.data,
             issues: issues.data,
@@ -46,20 +53,19 @@ export default class Repository extends Component {
     }
 
     async componentDidUpdate(_, prevState) {
-        const { issueState } = this.state;
+        const { issueState, page } = this.state;
+
+        const { match } = this.props;
+
+        const repoName = decodeURIComponent(match.params.repository);
+
+        console.log('Pagina atual:', page);
 
         if (prevState.issueState !== issueState) {
-            console.log('caiu no up');
-
-            const { match } = this.props;
-
-            const repoName = decodeURIComponent(match.params.repository);
-
             const [issues] = await Promise.all([
                 api.get(`/repos/${repoName}/issues`, {
                     params: {
                         state: issueState,
-                        per_page: 5,
                     },
                 }),
             ]);
@@ -69,6 +75,24 @@ export default class Repository extends Component {
                 loading: false,
             });
         }
+
+        if (prevState.page !== page) {
+            this.setState({ issues: [] });
+
+            const [apiIssues] = await Promise.all([
+                api.get(`/repos/${repoName}/issues?page=${page}`),
+            ]);
+
+            console.log(typeof apiIssues.data);
+
+            console.log(apiIssues.data.length);
+
+            if (apiIssues.data.length == 0) {
+                console.log('é 0');
+                this.setState({ page: page - 1 });
+            }
+            this.setState({ issues: apiIssues.data });
+        }
     }
 
     handleChange = () => {
@@ -77,9 +101,24 @@ export default class Repository extends Component {
         this.setState({ issueState: value, issues: [] });
     };
 
+    handleNext = () => {
+        let { page } = this.state;
+
+        page += 1;
+
+        this.setState({ page });
+    };
+
+    handlePrevious = () => {
+        const { page } = this.state;
+
+        if (page > 1) {
+            this.setState({ page: page - 1 });
+        }
+    };
+
     render() {
         const { repository, issues, loading } = this.state;
-
         if (loading) {
             return <Loading>Carregando</Loading>;
         }
@@ -107,6 +146,17 @@ export default class Repository extends Component {
                     </select>
                 </SelectCont>
 
+                <DivButtons>
+                    {this.state.page > 1 && (
+                        <PreviousPage onClick={this.handlePrevious}>
+                            Página Anterior
+                        </PreviousPage>
+                    )}
+                    <NextPage onClick={this.handleNext}>
+                        Proxima Página
+                    </NextPage>
+                </DivButtons>
+
                 <IssueList>
                     {issues.map((issue) => (
                         <li key={String(issue.id)}>
@@ -128,6 +178,16 @@ export default class Repository extends Component {
                         </li>
                     ))}
                 </IssueList>
+                <DivButtons>
+                    {this.state.page > 1 && (
+                        <PreviousPage onClick={this.handlePrevious}>
+                            Página Anterior
+                        </PreviousPage>
+                    )}
+                    <NextPage onClick={this.handleNext}>
+                        Proxima Página
+                    </NextPage>
+                </DivButtons>
             </Container>
         );
     }
