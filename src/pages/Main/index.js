@@ -49,7 +49,8 @@ export default class Main extends Component {
             const { newRepo, repositories } = this.state;
 
             repositories.map((repo) => {
-                if (repo.name.toLowCase() === newRepo.toLowCase()) {
+                console.log(repo.name, newRepo);
+                if (repo.name.toLowerCase() === newRepo.toLowerCase()) {
                     throw new Error('Repositórios duplicados');
                 }
             });
@@ -67,6 +68,7 @@ export default class Main extends Component {
                 repositoryNotFound: false,
             });
         } catch (e) {
+            console.log(e);
             this.setState({ repositoryNotFound: true, loading: false });
         }
     };
